@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>App Management API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #45a049; }
+        .app-list { margin-top: 20px; }
+        .app-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .nav-links {
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            margin-right: 15px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>App Management System</h1>
+        
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/view-database">View Database</a>
+        </div>
+
+        <h2>Add New App</h2>
+        <form id="addAppForm">
+            <div class="form-group">
+                <label for="app_name">App Name:</label>
+                <input type="text" id="app_name" name="app_name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="version">Version:</label>
+                <input type="text" id="version" name="version" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+            </div>
+            
+            <button type="submit">Add App</button>
+        </form>
+
+        <h2>App List</h2>
+        <div id="appList" class="app-list">
+            <!-- Apps will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Function to add a new app
+        document.getElementById('addAppForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = {
+                app_name: document.getElementById('app_name').value,
+                version: document.getElementById('version').value,
+                description: document.getElementById('description').value
+            };
+
+            try {
+                const response = await fetch('/add-app', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert('App added successfully!');
+                    document.getElementById('addAppForm').reset();
+                    loadApps();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error adding app: ' + error);
+            }
+        };
+
+        // Function to load all apps
+        async function loadApps() {
+            try {
+                const response = await fetch('/get-all-apps');
+                const apps = await response.json();
+                const appList = document.getElementById('appList');
+                appList.innerHTML = apps.map(app => `
+                    <div class="app-item">
+                        <h3>${app.app_name} (${app.version})</h3>
+                        <p>${app.description}</p>
+                        <p><small>Created: ${new Date(app.created_at).toLocaleString()}</small></p>
+                        <button onclick="deleteApp(${app.id})">Delete</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading apps:', error);
+            }
+        }
+
+        // Function to delete an app
+        async function deleteApp(id) {
+            if (confirm('Are you sure you want to delete this app?')) {
+                try {
+                    const response = await fetch(`/delete-app/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        alert('App deleted successfully!');
+                        loadApps();
+                    } else {
+                        alert('Error deleting app');
+                    }
+                } catch (error) {
+                    alert('Error: ' + error);
+                }
+            }
+        }
+
+        // Load apps when page loads
+        loadApps();
+    </script>
+</body>
+</html>

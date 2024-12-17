@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Contents</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .container { padding: 20px; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a {
+            margin-right: 15px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/view-database">View Database</a>
+        </div>
+        <h2>Database Contents (apps.db)</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>App Name</th>
+                <th>Version</th>
+                <th>Description</th>
+                <th>Created At</th>
+            </tr>
+            {% for app in apps %}
+            <tr>
+                <td>{{ app.id }}</td>
+                <td>{{ app.app_name }}</td>
+                <td>{{ app.version }}</td>
+                <td>{{ app.description }}</td>
+                <td>{{ app.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
