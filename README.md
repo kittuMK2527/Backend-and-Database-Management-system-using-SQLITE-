@@ -1,1 +1,0 @@
-# Backend-and-Database-Management-system-using-SQLITE-
